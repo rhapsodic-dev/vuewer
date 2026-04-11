@@ -1,0 +1,99 @@
+{
+  "name": "@rhapsodic/vuewer",
+  "version": "0.0.1",
+  "description": "Vue 3 image viewer composable",
+  "license": "MIT",
+  "type": "module",
+  "author": {
+    "name": "rhapsodic.dev",
+    "email": "rhapsodic.dev@gmail.com",
+    "url": "https://github.com/rhapsodic-dev"
+  },
+  "contributors": [
+    {
+      "name": "Svyatoslav Fyodorov",
+      "email": "intelrug@gmail.com",
+      "url": "https://github.com/intelrug"
+    },
+    {
+      "name": "TrenLok",
+      "email": "trenlok.dev@gmail.com",
+      "url": "https://github.com/trenlok"
+    }
+  ],
+  "keywords": [
+    "image",
+    "viewer",
+    "vue",
+    "vue3"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "vite --config vite.dev.config.mjs playground --host 0.0.0.0",
+    "build": "pnpm run build:lib",
+    "build:lib": "vite build",
+    "build:playground": "vite build --config vite.dev.config.mjs playground",
+    "dev:build": "pnpm run build:playground",
+    "preview:playground": "vite preview --config vite.dev.config.mjs playground --host 0.0.0.0",
+    "dev:preview": "pnpm run preview:playground",
+    "lint": "eslint .",
+    "format": "eslint . --fix",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json && vue-tsc --noEmit -p playground/tsconfig.json",
+    "release": "bumpp",
+    "test": "vitest run --config vite.dev.config.mjs",
+    "test:watch": "vitest watch --config vite.dev.config.mjs",
+    "prepare": "pnpm run hooks:install",
+    "hooks:install": "pnpm exec simple-git-hooks"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": [
+    "./dist/style.css"
+  ],
+  "peerDependencies": {
+    "vue": "^3.3.0"
+  },
+  "dependencies": {
+    "@vueuse/core": "^14.2.1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@rhapsodic/eslint-config": "^1.0.4",
+    "@types/node": "^25.6.0",
+    "@vitejs/plugin-vue": "^6.0.4",
+    "bumpp": "^11.0.1",
+    "eslint": "^10.1.0",
+    "eslint-plugin-vuejs-accessibility": "^2.5.0",
+    "globals": "^17.5.0",
+    "lint-staged": "^16.4.0",
+    "sass": "^1.98.0",
+    "simple-git-hooks": "^2.13.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.8",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.1.2",
+    "vue": "^3.5.31",
+    "vue-tsc": "^3.2.6"
+  },
+  "simple-git-hooks": {
+    "commit-msg": "pnpm exec commitlint --edit",
+    "pre-commit": "pnpm exec lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": "eslint --fix"
+  },
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
+}

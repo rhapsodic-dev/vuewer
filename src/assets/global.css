@@ -1,0 +1,10 @@
+.vuewer-icon {
+  display: block;
+  height: 1em;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 1em;
+  min-width: 1em;
+  width: 1em;
+  fill: currentColor;
+}
