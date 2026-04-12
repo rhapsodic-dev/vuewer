@@ -21,6 +21,14 @@
       "url": "https://github.com/trenlok"
     }
   ],
+  "homepage": "https://github.com/rhapsodic-dev/vuewer.git#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rhapsodic-dev/vuewer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rhapsodic-dev/vuewer/issues"
+  },
   "keywords": [
     "image",
     "viewer",
