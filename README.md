@@ -12,6 +12,19 @@ Image viewer for
 applications.
 </p>
 
+<p align="center">
+  <a href="https://npmjs.com/package/@rhapsodic/vuewer">
+    <img src="https://img.shields.io/npm/v/@rhapsodic/vuewer/latest.svg?style=flat&colorA=020420&colorB=00DC82" alt="npm version" />
+  </a>
+  <a href="https://npm.chart.dev/@rhapsodic/vuewer">
+    <img src="https://img.shields.io/npm/dm/@rhapsodic/vuewer?style=flat&colorA=020420&colorB=00DC82" alt="npm downloads" />
+  </a>
+  <a href="https://npmjs.com/package/@rhapsodic/vuewer">
+    <img src="https://img.shields.io/npm/l/@rhapsodic/vuewer?style=flat&colorA=020420&colorB=00DC82" alt="License" />
+  </a>
+</p>
+
+
 ## Features
 
 - 💪 &nbsp;Type safe integration of Vuewer into your project
