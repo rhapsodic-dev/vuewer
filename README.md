@@ -59,22 +59,19 @@ bun add @rhapsodic/vuewer
 
 ## Usage
 
+Import `@rhapsodic/vuewer/style.css`
 ```ts
 import { createApp } from 'vue'
-import VuewerPlugin from '@rhapsodic/vuewer'
 import '@rhapsodic/vuewer/style.css'
 
 import App from './App.vue'
 
-createApp(App)
-  .use(VuewerPlugin)
-  .mount('#app')
+createApp(App).mount('#app')
 ```
 
 ```vue
 <script setup>
 import { useVuewer } from '@rhapsodic/vuewer'
-import '@rhapsodic/vuewer/style.css'
 
 const { open } = useVuewer({
   images: [
@@ -93,8 +90,6 @@ const { open } = useVuewer({
   </button>
 </template>
 ```
-Note: Import `@rhapsodic/vuewer/style.css` in `setup` only if it has not already been imported in your app entry.
-
 `images` supports both raw strings and objects with thumbnail overrides:
 `string | { url: string, thumbUrl?: string }`.
 
