@@ -11,8 +11,8 @@
   >
     <div class="vuewer__overlay" />
     <div
+      ref="contentRef"
       class="vuewer__content"
-      @click.self="emit('close')"
     >
       <img
         ref="activeImageRef"
@@ -99,6 +99,7 @@ import { useVuewerPan } from '../composables/pan';
 import { useSwipeNavigation } from '../composables/swipe-navigation';
 import { useWheelZoomTuning } from '../composables/wheel-zoom-tuning';
 import { useWheelScrollTuning } from '../composables/wheel-scroll-tuning';
+import { useMouseClickClose } from '../composables/mouse-click-close';
 
 import type { VuewerProps, VuewerEmits, VuewerImage } from '.';
 
@@ -169,6 +170,15 @@ const { handleWheelScroll, resetWheelScrollState } = useWheelScrollTuning({
   onScrollDown: () => goToNextImage(),
   onScrollUp: () => goToPrevImage(),
 });
+const {
+  contentRef,
+  onViewerPointerDown: onClosePointerDown,
+  onViewerPointerMove: onClosePointerMove,
+  onViewerPointerUp: onClosePointerUp,
+  onViewerPointerCancel: onClosePointerCancel,
+} = useMouseClickClose({
+  onClose: () => emit('close'),
+});
 
 const hasNonInitialZoom = computed(() => Math.abs(imageScale.value - 1) > 0.001);
 const zoomPercentage = computed(() => Math.round(imageScale.value * 100));
@@ -207,11 +217,13 @@ const {
 setOnScaleChange(onScaleChange);
 
 function onViewerPointerDown(event: PointerEvent): void {
+  onClosePointerDown(event);
   onPanPointerDown(event);
   onSwipePointerDown(event);
 }
 
 function onViewerPointerMove(event: PointerEvent): void {
+  onClosePointerMove(event);
   onPanPointerMove(event);
   onSwipePointerMove(event);
 }
@@ -219,11 +231,13 @@ function onViewerPointerMove(event: PointerEvent): void {
 function onViewerPointerUp(event: PointerEvent): void {
   onPanPointerUp(event);
   onSwipePointerUp(event);
+  onClosePointerUp(event);
 }
 
 function onViewerPointerCancel(event: PointerEvent): void {
   onPanPointerCancel(event);
   onSwipePointerCancel(event);
+  onClosePointerCancel();
 }
 
 function resetScale(): void {
