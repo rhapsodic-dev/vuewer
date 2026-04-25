@@ -3,7 +3,11 @@
     v-bind="attrs"
     ref="viewerRef"
     class="vuewer"
-    :class="{ vuewer_hide_ui: idle }"
+    :class="{
+      vuewer_hide_ui: idle,
+      vuewer_state_touch_dismissing: isDismissDragging,
+    }"
+    :style="dismissStyle"
     @pointerdown="onViewerPointerDown"
     @pointermove="onViewerPointerMove"
     @pointerup="onViewerPointerUp"
@@ -100,6 +104,7 @@ import { useSwipeNavigation } from '../composables/swipe-navigation';
 import { useWheelZoomTuning } from '../composables/wheel-zoom-tuning';
 import { useWheelScrollTuning } from '../composables/wheel-scroll-tuning';
 import { useMouseClickClose } from '../composables/mouse-click-close';
+import { useTouchSwipeDismiss } from '../composables/touch-swipe-dismiss';
 
 import type { VuewerProps, VuewerEmits, VuewerImage } from '.';
 
@@ -198,6 +203,20 @@ const {
   imageRef: activeImageRef,
   imageScale,
 });
+const isTouchGestureNavigationEnabled = computed(() => !isImagePannable.value);
+const {
+  viewerStyle: dismissStyle,
+  isDismissDragging,
+  onViewerPointerDown: onDismissPointerDown,
+  onViewerPointerMove: onDismissPointerMove,
+  onViewerPointerUp: onDismissPointerUp,
+  onViewerPointerCancel: onDismissPointerCancel,
+} = useTouchSwipeDismiss({
+  viewerRef,
+  imageRef: activeImageRef,
+  isEnabled: isTouchGestureNavigationEnabled,
+  onDismiss: () => emit('close'),
+});
 
 const {
   onViewerPointerDown: onSwipePointerDown,
@@ -207,7 +226,7 @@ const {
 } = useSwipeNavigation({
   viewerRef,
   imageRef: activeImageRef,
-  isSwipeEnabled: computed(() => !isImagePannable.value),
+  isSwipeEnabled: isTouchGestureNavigationEnabled,
   onSwipeLeft: () => goToNextImage(),
   onSwipeRight: () => goToPrevImage(),
 });
@@ -218,23 +237,27 @@ setOnScaleChange(onScaleChange);
 
 function onViewerPointerDown(event: PointerEvent): void {
   onClosePointerDown(event);
+  onDismissPointerDown(event);
   onPanPointerDown(event);
   onSwipePointerDown(event);
 }
 
 function onViewerPointerMove(event: PointerEvent): void {
   onClosePointerMove(event);
+  onDismissPointerMove(event);
   onPanPointerMove(event);
   onSwipePointerMove(event);
 }
 
 function onViewerPointerUp(event: PointerEvent): void {
+  onDismissPointerUp(event);
   onPanPointerUp(event);
   onSwipePointerUp(event);
   onClosePointerUp(event);
 }
 
 function onViewerPointerCancel(event: PointerEvent): void {
+  onDismissPointerCancel(event);
   onPanPointerCancel(event);
   onSwipePointerCancel(event);
   onClosePointerCancel();
@@ -349,7 +372,12 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 .vuewer {
-  --vuewer__ui_opacity: 1;
+  --vuewer__base-ui-opacity: 1;
+  --vuewer__touch-dismiss-opacity: 1;
+  --vuewer__touch-dismiss-offset-y: 0px;
+  --vuewer__touch-dismiss-scale: 1;
+  --vuewer__touch-dismiss-transition-duration: 220ms;
+  --vuewer__ui-opacity: calc(var(--vuewer__base-ui-opacity) * var(--vuewer__touch-dismiss-opacity));
 
   position: fixed;
   inset: 0;
@@ -373,6 +401,8 @@ onBeforeUnmount(() => {
     background: rgba(1, 0, 18, 0.35);
     inset: 0;
     backdrop-filter: blur(15px);
+    opacity: var(--vuewer__touch-dismiss-opacity);
+    transition: opacity var(--vuewer__touch-dismiss-transition-duration) ease;
   }
 
   &__content {
@@ -384,6 +414,12 @@ onBeforeUnmount(() => {
     inset: 0;
     /* Keep native touch gestures from competing with custom viewer zoom/pan. */
     touch-action: none;
+    opacity: var(--vuewer__touch-dismiss-opacity);
+    transform: translate3d(0, var(--vuewer__touch-dismiss-offset-y), 0) scale(var(--vuewer__touch-dismiss-scale));
+    transition:
+      transform var(--vuewer__touch-dismiss-transition-duration) ease,
+      opacity var(--vuewer__touch-dismiss-transition-duration) ease;
+    will-change: transform, opacity;
   }
 
   &__active-image {
@@ -405,8 +441,8 @@ onBeforeUnmount(() => {
   &__ui {
     position: fixed;
     z-index: 3;
-    opacity: var(--vuewer__ui_opacity);
-    transition: opacity .3s;
+    opacity: var(--vuewer__ui-opacity);
+    transition: opacity var(--vuewer__touch-dismiss-transition-duration) ease;
   }
 
   &__navigation {
@@ -419,9 +455,9 @@ onBeforeUnmount(() => {
     gap: 12px;
     align-items: center;
     padding-bottom: calc(25px + env(safe-area-inset-bottom));
-    opacity: var(--vuewer__ui_opacity);
+    opacity: var(--vuewer__ui-opacity);
     filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.35));
-    transition: opacity .3s;
+    transition: opacity var(--vuewer__touch-dismiss-transition-duration) ease;
     transform: translateX(-50%);
   }
 
@@ -465,7 +501,20 @@ onBeforeUnmount(() => {
 
   &_hide {
     &_ui {
-      --vuewer__ui_opacity: 0;
+      --vuewer__base-ui-opacity: 0;
+    }
+  }
+
+  &_state {
+    &_touch {
+      &_dismissing {
+        .vuewer__overlay,
+        .vuewer__content,
+        .vuewer__ui,
+        .vuewer__navigation {
+          transition: none;
+        }
+      }
     }
   }
 }
