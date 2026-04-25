@@ -31,7 +31,6 @@ export interface DismissDecisionInput {
 
 export interface UseTouchSwipeDismissOptions {
   viewerRef: Ref<HTMLElement | null>;
-  imageRef: Ref<HTMLImageElement | null>;
   isEnabled: Ref<boolean>;
   onDismiss?: () => void;
 }
@@ -179,13 +178,7 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
       return false;
     }
 
-    const image = options.imageRef.value;
-    const eventTarget = event.target;
-    if (!image || !(eventTarget instanceof Node)) {
-      return false;
-    }
-
-    return image.contains(eventTarget);
+    return true;
   }
 
   function onViewerPointerDown(event: PointerEvent): void {

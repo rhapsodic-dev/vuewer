@@ -186,7 +186,6 @@ const pan = useVuewerPan({
 const isTouchGestureNavigationEnabled = computed(() => !pan.isImagePannable.value);
 const touchSwipeDismiss = useTouchSwipeDismiss({
   viewerRef,
-  imageRef: activeImageRef,
   isEnabled: isTouchGestureNavigationEnabled,
   onDismiss: () => emit('close'),
 });
