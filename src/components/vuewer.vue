@@ -5,9 +5,9 @@
     class="vuewer"
     :class="{
       vuewer_hide_ui: idle,
-      vuewer_state_touch_dismissing: isDismissDragging,
+      vuewer_state_touch_dismissing: touchSwipeDismiss.isDismissDragging.value,
     }"
-    :style="dismissStyle"
+    :style="touchSwipeDismiss.viewerStyle.value"
     @pointerdown="onViewerPointerDown"
     @pointermove="onViewerPointerMove"
     @pointerup="onViewerPointerUp"
@@ -24,12 +24,12 @@
         alt=""
         class="vuewer__active-image"
         :class="{
-          'vuewer__active-image_state_pannable': isImagePannable,
-          'vuewer__active-image_state_dragging': isImageDragging,
+          'vuewer__active-image_state_pannable': pan.isImagePannable.value,
+          'vuewer__active-image_state_dragging': pan.isImageDragging.value,
         }"
-        :style="{ transform: activeImageTransform }"
+        :style="{ transform: pan.imageTransform.value }"
         draggable="false"
-        @load="onActiveImageLoad"
+        @load="pan.onImageLoad"
       >
     </div>
 
@@ -158,72 +158,40 @@ const defaultImage = computed(() => {
 const viewerRef = ref<HTMLElement | null>(null);
 const activeImageRef = ref<HTMLImageElement | null>(null);
 const currentImage = ref<ImageItem>();
-const {
-  imageScale,
-  handleScale,
-  resetScale: resetZoomScale,
-  setOnScaleChange,
-} = useVuewerZoom({
+const zoom = useVuewerZoom({
   zoomableElementRef: viewerRef,
 });
 
-const { handleWheelZoom } = useWheelZoomTuning({
-  onScale: (delta, focalPoint) => handleScale(delta, focalPoint),
+const wheelZoom = useWheelZoomTuning({
+  onScale: (delta, focalPoint) => zoom.handleScale(delta, focalPoint),
 });
 
-const { handleWheelScroll, resetWheelScrollState } = useWheelScrollTuning({
+const wheelScroll = useWheelScrollTuning({
   onScrollDown: () => goToNextImage(),
   onScrollUp: () => goToPrevImage(),
 });
-const {
-  contentRef,
-  onViewerPointerDown: onClosePointerDown,
-  onViewerPointerMove: onClosePointerMove,
-  onViewerPointerUp: onClosePointerUp,
-  onViewerPointerCancel: onClosePointerCancel,
-} = useMouseClickClose({
+const mouseClickClose = useMouseClickClose({
   onClose: () => emit('close'),
 });
+const contentRef = mouseClickClose.contentRef;
 
-const hasNonInitialZoom = computed(() => Math.abs(imageScale.value - 1) > 0.001);
-const zoomPercentage = computed(() => Math.round(imageScale.value * 100));
-const {
-  onScaleChange,
-  imageTransform: activeImageTransform,
-  isImageDragging,
-  isImagePannable,
-  onImageLoad: onActiveImageLoad,
-  onViewerPointerDown: onPanPointerDown,
-  onViewerPointerMove: onPanPointerMove,
-  onViewerPointerUp: onPanPointerUp,
-  onViewerPointerCancel: onPanPointerCancel,
-  resetPan,
-} = useVuewerPan({
+const hasNonInitialZoom = computed(() => Math.abs(zoom.imageScale.value - 1) > 0.001);
+const zoomPercentage = computed(() => Math.round(zoom.imageScale.value * 100));
+const pan = useVuewerPan({
   viewerRef,
   imageRef: activeImageRef,
-  imageScale,
+  imageScale: zoom.imageScale,
 });
-const isTouchGestureNavigationEnabled = computed(() => !isImagePannable.value);
-const {
-  viewerStyle: dismissStyle,
-  isDismissDragging,
-  onViewerPointerDown: onDismissPointerDown,
-  onViewerPointerMove: onDismissPointerMove,
-  onViewerPointerUp: onDismissPointerUp,
-  onViewerPointerCancel: onDismissPointerCancel,
-} = useTouchSwipeDismiss({
+
+const isTouchGestureNavigationEnabled = computed(() => !pan.isImagePannable.value);
+const touchSwipeDismiss = useTouchSwipeDismiss({
   viewerRef,
   imageRef: activeImageRef,
   isEnabled: isTouchGestureNavigationEnabled,
   onDismiss: () => emit('close'),
 });
 
-const {
-  onViewerPointerDown: onSwipePointerDown,
-  onViewerPointerMove: onSwipePointerMove,
-  onViewerPointerUp: onSwipePointerUp,
-  onViewerPointerCancel: onSwipePointerCancel,
-} = useSwipeNavigation({
+const swipeNavigation = useSwipeNavigation({
   viewerRef,
   imageRef: activeImageRef,
   isSwipeEnabled: isTouchGestureNavigationEnabled,
@@ -233,39 +201,39 @@ const {
 // Bridge zoom scale events to pan logic.
 // This keeps zoom centered around the active pointer/touch location
 // instead of always zooming around the viewport center.
-setOnScaleChange(onScaleChange);
+zoom.setOnScaleChange(pan.onScaleChange);
 
 function onViewerPointerDown(event: PointerEvent): void {
-  onClosePointerDown(event);
-  onDismissPointerDown(event);
-  onPanPointerDown(event);
-  onSwipePointerDown(event);
+  mouseClickClose.onViewerPointerDown(event);
+  touchSwipeDismiss.onViewerPointerDown(event);
+  pan.onViewerPointerDown(event);
+  swipeNavigation.onViewerPointerDown(event);
 }
 
 function onViewerPointerMove(event: PointerEvent): void {
-  onClosePointerMove(event);
-  onDismissPointerMove(event);
-  onPanPointerMove(event);
-  onSwipePointerMove(event);
+  mouseClickClose.onViewerPointerMove(event);
+  touchSwipeDismiss.onViewerPointerMove(event);
+  pan.onViewerPointerMove(event);
+  swipeNavigation.onViewerPointerMove(event);
 }
 
 function onViewerPointerUp(event: PointerEvent): void {
-  onDismissPointerUp(event);
-  onPanPointerUp(event);
-  onSwipePointerUp(event);
-  onClosePointerUp(event);
+  touchSwipeDismiss.onViewerPointerUp(event);
+  pan.onViewerPointerUp(event);
+  swipeNavigation.onViewerPointerUp(event);
+  mouseClickClose.onViewerPointerUp(event);
 }
 
 function onViewerPointerCancel(event: PointerEvent): void {
-  onDismissPointerCancel(event);
-  onPanPointerCancel(event);
-  onSwipePointerCancel(event);
-  onClosePointerCancel();
+  touchSwipeDismiss.onViewerPointerCancel(event);
+  pan.onViewerPointerCancel(event);
+  swipeNavigation.onViewerPointerCancel(event);
+  mouseClickClose.onViewerPointerCancel();
 }
 
 function resetScale(): void {
-  resetZoomScale();
-  resetPan();
+  zoom.resetScale();
+  pan.resetPan();
 }
 
 function setActiveImage(imageId: number) {
@@ -281,7 +249,9 @@ function setActiveImage(imageId: number) {
 }
 
 function goToNextImage(): void {
-  if (!currentImage.value) return;
+  if (!currentImage.value) {
+    return;
+  }
 
   const currentId = currentImage.value.id;
   const nextId = (currentId + 1) % imagesMap.value.size;
@@ -290,7 +260,9 @@ function goToNextImage(): void {
 }
 
 function goToPrevImage(): void {
-  if (!currentImage.value) return;
+  if (!currentImage.value) {
+    return;
+  }
 
   const currentId = currentImage.value.id;
   const prevId = (currentId - 1 + imagesMap.value.size) % imagesMap.value.size;
@@ -333,17 +305,17 @@ function onWheel(event: WheelEvent): void {
   event.preventDefault();
 
   if (event.ctrlKey) {
-    resetWheelScrollState();
-    handleWheelZoom(event);
+    wheelScroll.resetWheelScrollState();
+    wheelZoom.handleWheelZoom(event);
     return;
   }
 
   if (props.images.length <= 1) {
-    resetWheelScrollState();
+    wheelScroll.resetWheelScrollState();
     return;
   }
 
-  handleWheelScroll(event);
+  wheelScroll.handleWheelScroll(event);
 }
 
 watch(imagesMap, (newMap) => {
