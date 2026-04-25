@@ -171,6 +171,7 @@ const wheelScroll = useWheelScrollTuning({
   onScrollUp: () => goToPrevImage(),
 });
 const mouseClickClose = useMouseClickClose({
+  imageRef: activeImageRef,
   onClose: () => emit('close'),
 });
 const contentRef = mouseClickClose.contentRef;
