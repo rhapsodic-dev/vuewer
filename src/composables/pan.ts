@@ -4,6 +4,7 @@ import {
 } from 'vue';
 
 import { clamp } from '../utils/math';
+import { useActivePointer } from './active-pointer';
 import { useTouchPointerLifecycle } from './touch-pointer-lifecycle';
 
 import type { ZoomScaleChange } from './zoom';
@@ -65,15 +66,15 @@ export function useVuewerPan({
   const imageOffsetY = ref(0);
   const maxPanOffsetX = ref(0);
   const maxPanOffsetY = ref(0);
-  const activePanPointerId = ref<number | null>(null);
   const panStartClientX = ref(0);
   const panStartClientY = ref(0);
   const panStartOffsetX = ref(0);
   const panStartOffsetY = ref(0);
+  const panPointer = useActivePointer();
   const touchPointerLifecycle = useTouchPointerLifecycle();
 
   const isImagePannable = computed(() => maxPanOffsetX.value > 0 || maxPanOffsetY.value > 0);
-  const isImageDragging = computed(() => activePanPointerId.value !== null);
+  const isImageDragging = computed(() => panPointer.getActivePointerId() !== undefined);
   const imageTransform = computed(() => `translate3d(${imageOffsetX.value}px, ${imageOffsetY.value}px, 0) scale(${imageScale.value})`);
 
   function resetImagePanPosition(): void {
@@ -146,15 +147,7 @@ export function useVuewerPan({
   }
 
   function stopImageDragging(): void {
-    const pointerId = activePanPointerId.value;
-    if (pointerId === null) return;
-
-    const viewer = viewerRef.value;
-    if (viewer?.hasPointerCapture(pointerId)) {
-      viewer.releasePointerCapture(pointerId);
-    }
-
-    activePanPointerId.value = null;
+    panPointer.deactivatePointer(viewerRef.value);
   }
 
   function clearCurrentImagePanState(): void {
@@ -254,16 +247,11 @@ export function useVuewerPan({
       return;
     }
 
-    activePanPointerId.value = event.pointerId;
+    panPointer.activatePointer(viewerRef.value, event.pointerId);
     panStartClientX.value = event.clientX;
     panStartClientY.value = event.clientY;
     panStartOffsetX.value = imageOffsetX.value;
     panStartOffsetY.value = imageOffsetY.value;
-
-    const viewer = viewerRef.value;
-    if (viewer && !viewer.hasPointerCapture(event.pointerId)) {
-      viewer.setPointerCapture(event.pointerId);
-    }
 
     event.preventDefault();
   }
@@ -274,7 +262,7 @@ export function useVuewerPan({
       return;
     }
 
-    if (activePanPointerId.value !== event.pointerId) {
+    if (!panPointer.hasActivePointer(event.pointerId)) {
       return;
     }
 
@@ -292,7 +280,7 @@ export function useVuewerPan({
   function onViewerPointerUp(event: PointerEvent): void {
     touchPointerLifecycle.unregisterPointer(event.pointerType, event.pointerId);
 
-    if (activePanPointerId.value === event.pointerId) {
+    if (panPointer.hasActivePointer(event.pointerId)) {
       stopImageDragging();
     }
   }
@@ -300,7 +288,7 @@ export function useVuewerPan({
   function onViewerPointerCancel(event: PointerEvent): void {
     touchPointerLifecycle.unregisterPointer(event.pointerType, event.pointerId);
 
-    if (activePanPointerId.value === event.pointerId) {
+    if (panPointer.hasActivePointer(event.pointerId)) {
       stopImageDragging();
     }
   }

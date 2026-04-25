@@ -1,6 +1,7 @@
 import type { Ref } from 'vue';
 import { onBeforeUnmount, ref } from 'vue';
 
+import { useActivePointer } from './active-pointer';
 import { useTouchPointerLifecycle } from './touch-pointer-lifecycle';
 
 export type TouchSwipeDirection = 'left' | 'right';
@@ -54,21 +55,13 @@ export function useSwipeNavigation({
   onSwipeLeft,
   onSwipeRight,
 }: UseSwipeNavigationOptions) {
-  const activeSwipePointerId = ref<number | null>(null);
   const swipeStartClientX = ref(0);
   const swipeStartClientY = ref(0);
+  const swipePointer = useActivePointer();
   const touchPointerLifecycle = useTouchPointerLifecycle();
 
   function stopSwipeTracking(): void {
-    const pointerId = activeSwipePointerId.value;
-    if (pointerId === null) return;
-
-    const viewer = viewerRef.value;
-    if (viewer?.hasPointerCapture(pointerId)) {
-      viewer.releasePointerCapture(pointerId);
-    }
-
-    activeSwipePointerId.value = null;
+    swipePointer.deactivatePointer(viewerRef.value);
   }
 
   function clearSwipeState(): void {
@@ -109,14 +102,9 @@ export function useSwipeNavigation({
       return;
     }
 
-    activeSwipePointerId.value = event.pointerId;
+    swipePointer.activatePointer(viewerRef.value, event.pointerId);
     swipeStartClientX.value = event.clientX;
     swipeStartClientY.value = event.clientY;
-
-    const viewer = viewerRef.value;
-    if (viewer && !viewer.hasPointerCapture(event.pointerId)) {
-      viewer.setPointerCapture(event.pointerId);
-    }
   }
 
   function onViewerPointerMove(event: PointerEvent): void {
@@ -125,7 +113,7 @@ export function useSwipeNavigation({
       return;
     }
 
-    if (activeSwipePointerId.value === event.pointerId) {
+    if (swipePointer.hasActivePointer(event.pointerId)) {
       event.preventDefault();
     }
   }
@@ -133,7 +121,7 @@ export function useSwipeNavigation({
   function onViewerPointerUp(event: PointerEvent): void {
     touchPointerLifecycle.unregisterPointer(event.pointerType, event.pointerId);
 
-    if (activeSwipePointerId.value !== event.pointerId) {
+    if (!swipePointer.hasActivePointer(event.pointerId)) {
       return;
     }
 
@@ -159,7 +147,7 @@ export function useSwipeNavigation({
   function onViewerPointerCancel(event: PointerEvent): void {
     touchPointerLifecycle.unregisterPointer(event.pointerType, event.pointerId);
 
-    if (activeSwipePointerId.value === event.pointerId) {
+    if (swipePointer.hasActivePointer(event.pointerId)) {
       stopSwipeTracking();
     }
   }
