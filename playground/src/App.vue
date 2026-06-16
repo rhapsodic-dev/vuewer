@@ -40,35 +40,35 @@ watch(isOpened, (newVal) => {
 
 <style>
 body {
-  background-color: #161616;
-  color: #ffffff;
   margin: 0;
-  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  color: #ffffff;
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  background-color: #161616;
 }
 
 .container {
   display: grid;
-  place-items: center;
-  height: 100vh;
   grid-template-rows: 1fr;
   grid-template-columns: 1fr;
+  place-items: center;
+  height: 100vh;
 }
 
 .button {
-  border: none;
-  outline: none;
   display: block;
-  background-color: #ffffff;
-  border-radius: 8px;
   line-height: normal;
-  transition: background-color 0.5s ease;
   cursor: pointer;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  transition: background-color .5s ease;
 }
 
 .open-button {
-  font-weight: 500;
-  font-size: 20px;
   padding: 15px 20px;
+  font-size: 20px;
+  font-weight: 500;
 }
 
 .button:hover {
@@ -77,10 +77,10 @@ body {
 
 .close-button {
   position: absolute;
-  z-index: 999999;
   top: 10px;
   left: 10px;
-  font-size: 14px;
+  z-index: 999999;
   padding: 5px 10px;
+  font-size: 14px;
 }
 </style>

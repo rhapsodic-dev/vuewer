@@ -42,7 +42,7 @@ const emit = defineEmits<VuewerButtonEmits>();
     }
   }
 
-  @media (min-width: 769px) {
+  @media (width >= 769px) {
     &_side {
       &_left {
         padding-right: 120px;

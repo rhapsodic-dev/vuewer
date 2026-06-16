@@ -34,7 +34,7 @@ const emit = defineEmits<VuewerCarouselItemEmits>();
   border: 0;
   outline: none;
   opacity: .6;
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity .3s ease-in-out;
 
   &:deep(img) {
     width: 100%;

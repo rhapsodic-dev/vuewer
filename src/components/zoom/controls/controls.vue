@@ -34,7 +34,7 @@ const emit = defineEmits<{
   align-items: center;
   padding: 6px 10px;
   color: white;
-  background: rgb(0, 0, 0, 0.35);
+  background: rgb(0, 0, 0, .35);
   border-radius: 999px;
   backdrop-filter: blur(8px);
 
@@ -53,16 +53,16 @@ const emit = defineEmits<{
     height: 28px;
     padding: 0;
     color: white;
-    cursor: pointer;
     font-size: 14px;
-    background: rgb(255, 255, 255, 0.12);
+    cursor: pointer;
+    background: rgb(255, 255, 255, .12);
     border: 0;
     border-radius: 999px;
-    transition: background 0.2s ease;
+    transition: background .2s ease;
 
     &:hover,
     &:focus-visible {
-      background: rgb(255, 255, 255, 0.2);
+      background: rgb(255, 255, 255, .2);
     }
   }
 }

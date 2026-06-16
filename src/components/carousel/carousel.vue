@@ -268,22 +268,21 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 .vuewer-carousel {
-  --vuewer-carousel-edge-padding-start: 0px;
-  --vuewer-carousel-edge-padding-end: 0px;
+  --vuewer-carousel-edge-padding-start: 0;
+  --vuewer-carousel-edge-padding-end: 0;
 
   position: relative;
+  overflow: auto hidden;
   width: calc(100vw - 32px);
   max-width: 100vw;
-  overflow-x: auto;
-  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
 
   &::-webkit-scrollbar {
+    display: none;
     width: 0;
     height: 0;
-    display: none;
   }
 
   &__track {
@@ -293,8 +292,7 @@ onBeforeUnmount(() => {
     justify-content: flex-start;
     width: max-content;
     height: 90px;
-    padding-inline-start: var(--vuewer-carousel-edge-padding-start);
-    padding-inline-end: var(--vuewer-carousel-edge-padding-end);
+    padding-inline: var(--vuewer-carousel-edge-padding-start) var(--vuewer-carousel-edge-padding-end);
     white-space: nowrap;
   }
 }

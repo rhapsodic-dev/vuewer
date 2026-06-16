@@ -346,7 +346,7 @@ onBeforeUnmount(() => {
 .vuewer {
   --vuewer__base-ui-opacity: 1;
   --vuewer__touch-dismiss-opacity: 1;
-  --vuewer__touch-dismiss-offset-y: 0px;
+  --vuewer__touch-dismiss-offset-y: 0;
   --vuewer__touch-dismiss-scale: 1;
   --vuewer__touch-dismiss-transition-duration: 220ms;
   --vuewer__ui-opacity: calc(var(--vuewer__base-ui-opacity) * var(--vuewer__touch-dismiss-opacity));
@@ -354,9 +354,10 @@ onBeforeUnmount(() => {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  user-select: none;
+
   /* Prevent scroll chaining/bounce from leaking to the background page. */
   overscroll-behavior: contain;
+  user-select: none;
 
   & img {
     width: auto;
@@ -368,30 +369,31 @@ onBeforeUnmount(() => {
 
   &__overlay {
     position: absolute;
+    inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: rgba(1, 0, 18, 0.35);
-    inset: 0;
-    backdrop-filter: blur(15px);
+    background: rgb(1, 0, 18, .35);
     opacity: var(--vuewer__touch-dismiss-opacity);
     transition: opacity var(--vuewer__touch-dismiss-transition-duration) ease;
+    backdrop-filter: blur(15px);
   }
 
   &__content {
     position: absolute;
+    inset: 0;
     z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    inset: 0;
-    /* Keep native touch gestures from competing with custom viewer zoom/pan. */
-    touch-action: none;
     opacity: var(--vuewer__touch-dismiss-opacity);
-    transform: translate3d(0, var(--vuewer__touch-dismiss-offset-y), 0) scale(var(--vuewer__touch-dismiss-scale));
     transition:
       transform var(--vuewer__touch-dismiss-transition-duration) ease,
       opacity var(--vuewer__touch-dismiss-transition-duration) ease;
+    transform: translate3d(0, var(--vuewer__touch-dismiss-offset-y), 0) scale(var(--vuewer__touch-dismiss-scale));
     will-change: transform, opacity;
+
+    /* Keep native touch gestures from competing with custom viewer zoom/pan. */
+    touch-action: none;
   }
 
   &__active-image {
@@ -428,9 +430,9 @@ onBeforeUnmount(() => {
     align-items: center;
     padding-bottom: calc(25px + env(safe-area-inset-bottom));
     opacity: var(--vuewer__ui-opacity);
-    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.35));
     transition: opacity var(--vuewer__touch-dismiss-transition-duration) ease;
     transform: translateX(-50%);
+    filter: drop-shadow(0 10px 24px rgb(0, 0, 0, .35));
   }
 
   &__images {
@@ -452,14 +454,14 @@ onBeforeUnmount(() => {
     color: white;
     font-size: 2em;
     cursor: pointer;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgb(0, 0, 0, .5);
     border: none;
     border-radius: 50%;
-    transition: background 0.2s ease;
+    transition: background .2s ease;
     transform: translateY(-50%);
 
     &:hover {
-      background: rgba(0, 0, 0, 0.7);
+      background: rgb(0, 0, 0, .7);
     }
 
     &--prev {

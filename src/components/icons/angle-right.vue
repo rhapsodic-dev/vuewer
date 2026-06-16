@@ -15,7 +15,7 @@
 
 <style scoped lang="scss">
 .vuewer-icon {
-  width: 0.5em;
+  width: .5em;
   height: 1em;
 }
 </style>
