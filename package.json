@@ -53,8 +53,12 @@
     "dev:build": "pnpm run build:playground",
     "preview:playground": "vite preview --config vite.dev.config.mjs playground --host 0.0.0.0",
     "dev:preview": "pnpm run preview:playground",
-    "lint": "eslint .",
-    "format": "eslint . --fix",
+    "lint": "pnpm run lint:scripts && pnpm run lint:styles",
+    "lint:styles": "stylelint \"**/*.{css,scss,vue}\" --allow-empty-input",
+    "lint:scripts": "eslint .",
+    "format": "pnpm run format:scripts && pnpm run format:styles",
+    "format:scripts": "eslint . --fix",
+    "format:styles": "stylelint \"**/*.{css,scss,vue}\" --allow-empty-input --fix",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json && vue-tsc --noEmit -p playground/tsconfig.json",
     "release": "bumpp",
     "test": "vitest run --config vite.dev.config.mjs",
@@ -80,6 +84,7 @@
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
     "@rhapsodic/eslint-config": "^1.0.5",
+    "@rhapsodic/stylelint-config": "^1.0.1",
     "@types/node": "^25.9.1",
     "@vitejs/plugin-vue": "^6.0.7",
     "bumpp": "^11.1.0",
@@ -101,7 +106,8 @@
     "pre-commit": "pnpm exec lint-staged"
   },
   "lint-staged": {
-    "*.{js,ts,vue}": "eslint --fix"
+    "*.{js,ts,vue}": "eslint --fix",
+    "*.{css,scss,vue}": "stylelint --allow-empty-input --fix"
   },
   "packageManager": "pnpm@11.5.0+sha512.dbfcc4f81cf48597afd4bc391ffdf12c11f1a9fb83a395bfa6b0a2d9cc2fd8ffebafdb1ccbd529632153f793904c2615b7f09fe1a345473fd1c35845172a8eb1"
 }

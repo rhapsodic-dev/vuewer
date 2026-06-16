@@ -38,8 +38,11 @@ jobs:
       - name: Run tests
         run: pnpm run test
 
-      - name: Run lint
-        run: pnpm run lint
+      - name: Css style check
+        run: pnpm run lint:styles
+
+      - name: Js style check
+        run: pnpm run lint:scripts
 
       - name: Run build
         run: pnpm run build
