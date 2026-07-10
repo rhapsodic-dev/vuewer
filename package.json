@@ -75,31 +75,31 @@
     "./dist/style.css"
   ],
   "peerDependencies": {
-    "vue": "^3.5.38"
+    "vue": "^3.5.39"
   },
   "dependencies": {
     "@vueuse/core": "^14.3.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.0.2",
-    "@commitlint/config-conventional": "^21.0.2",
+    "@commitlint/cli": "^21.1.0",
+    "@commitlint/config-conventional": "^21.1.0",
     "@rhapsodic/eslint-config": "^1.0.5",
     "@rhapsodic/stylelint-config": "^1.0.1",
-    "@types/node": "^25.9.3",
+    "@types/node": "^25.9.4",
     "@vitejs/plugin-vue": "^6.0.7",
     "bumpp": "^11.1.0",
     "eslint": "^10.5.0",
     "eslint-plugin-vuejs-accessibility": "^2.5.0",
-    "globals": "^17.6.0",
-    "lint-staged": "^17.0.7",
+    "globals": "^17.7.0",
+    "lint-staged": "^17.0.8",
     "sass": "^1.101.0",
     "simple-git-hooks": "^2.13.1",
-    "stylelint": "^17.13.0",
+    "stylelint": "^17.14.0",
     "typescript": "~6.0.3",
-    "vite": "^8.0.16",
-    "vite-plugin-dts": "^5.0.2",
+    "vite": "^8.1.0",
+    "vite-plugin-dts": "^5.0.3",
     "vitest": "^4.1.9",
-    "vue": "^3.5.38",
+    "vue": "^3.5.39",
     "vue-tsc": "^3.3.5"
   },
   "simple-git-hooks": {
@@ -110,5 +110,5 @@
     "*.{js,ts,vue}": "eslint --fix",
     "*.{css,scss,vue}": "stylelint --allow-empty-input --fix"
   },
-  "packageManager": "pnpm@11.7.0+sha512.19cc852c120c7125760f2443ee6be0ca5b40f9f50598de1a09a1f177503e010e57c23c77646e01e761de59bf874fb22a3398c33ab9691fc13eb946b6f0f4d620"
+  "packageManager": "pnpm@11.9.0+sha512.bd682d5d03fe525ef7c9fd6780c6884d1e756ac4c9c9fe00c538782824310dcf90e3ddc4f53835f06dfaebd5085e41855e0bcbb3b60de2ac5bbab89e5036f03b"
 }
