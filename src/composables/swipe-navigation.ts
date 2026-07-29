@@ -1,5 +1,8 @@
 import type { Ref } from 'vue';
-import { onBeforeUnmount, ref } from 'vue';
+import {
+  onBeforeUnmount,
+  ref,
+} from 'vue';
 
 import { useActivePointer } from './active-pointer';
 import { useTouchPointerLifecycle } from './touch-pointer-lifecycle';
@@ -125,15 +128,15 @@ export function useSwipeNavigation({
       return;
     }
 
-    const deltaX = event.clientX - swipeStartClientX.value;
-    const deltaY = event.clientY - swipeStartClientY.value;
-    const swipeDirection = getTouchSwipeDirection({ deltaX, deltaY });
-
     // Re-check at gesture end so we do not navigate if state switched to pannable.
     if (!isSwipeEnabled.value) {
       stopSwipeTracking();
       return;
     }
+
+    const deltaX = event.clientX - swipeStartClientX.value;
+    const deltaY = event.clientY - swipeStartClientY.value;
+    const swipeDirection = getTouchSwipeDirection({ deltaX, deltaY });
 
     if (swipeDirection === 'left') {
       onSwipeLeft?.();

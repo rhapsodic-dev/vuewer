@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import {
+  describe,
+  expect,
+  it,
+} from 'vitest';
 import { getPanOffsetAtScaleChange } from '../src/composables/pan';
 
 describe('getPanOffsetAtScaleChange', () => {

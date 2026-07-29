@@ -1,6 +1,10 @@
 import type { Ref } from 'vue';
 import {
-  computed, onBeforeUnmount, onMounted, ref, watch,
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
 } from 'vue';
 
 import { clamp } from '../utils/math';
@@ -73,8 +77,8 @@ export function useVuewerPan({
   const panPointer = useActivePointer();
   const touchPointerLifecycle = useTouchPointerLifecycle();
 
-  const isImagePannable = computed(() => maxPanOffsetX.value > 0 || maxPanOffsetY.value > 0);
-  const isImageDragging = computed(() => panPointer.getActivePointerId() !== undefined);
+  const imagePannable = computed(() => maxPanOffsetX.value > 0 || maxPanOffsetY.value > 0);
+  const imageDragging = computed(() => panPointer.getActivePointerId() !== undefined);
   const imageTransform = computed(() => `translate3d(${imageOffsetX.value}px, ${imageOffsetY.value}px, 0) scale(${imageScale.value})`);
 
   function resetImagePanPosition(): void {
@@ -211,7 +215,7 @@ export function useVuewerPan({
   }
 
   function canStartPanFromPointer(event: PointerEvent): boolean {
-    if (!isImagePannable.value) {
+    if (!imagePannable.value) {
       return false;
     }
 
@@ -298,20 +302,20 @@ export function useVuewerPan({
   });
 
   onMounted(() => {
-    globalThis.addEventListener('resize', onResize);
+    addEventListener('resize', onResize);
     recalculatePanBounds();
   });
 
   onBeforeUnmount(() => {
     clearCurrentImagePanState();
-    globalThis.removeEventListener('resize', onResize);
+    removeEventListener('resize', onResize);
   });
 
   return {
     onScaleChange,
     imageTransform,
-    isImageDragging,
-    isImagePannable,
+    isImageDragging: imageDragging,
+    isImagePannable: imagePannable,
     onImageLoad,
     onViewerPointerDown,
     onViewerPointerMove,

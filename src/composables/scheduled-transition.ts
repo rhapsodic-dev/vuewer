@@ -20,19 +20,19 @@ export interface UseScheduledTransitionOptions {
  */
 export function useScheduledTransition(options: UseScheduledTransitionOptions) {
   let transitionFrameId: number | undefined;
-  let transitionTimeoutId: ReturnType<typeof globalThis.setTimeout> | undefined;
+  let transitionTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
   /**
    * Cancels any pending frame or completion callback for the active transition.
    */
   function cancelTransition(): void {
     if (transitionFrameId !== undefined) {
-      globalThis.cancelAnimationFrame(transitionFrameId);
+      cancelAnimationFrame(transitionFrameId);
       transitionFrameId = undefined;
     }
 
     if (transitionTimeoutId !== undefined) {
-      globalThis.clearTimeout(transitionTimeoutId);
+      clearTimeout(transitionTimeoutId);
       transitionTimeoutId = undefined;
     }
   }
@@ -46,11 +46,11 @@ export function useScheduledTransition(options: UseScheduledTransitionOptions) {
   function runTransition(config: RunScheduledTransitionOptions): void {
     cancelTransition();
 
-    transitionFrameId = globalThis.requestAnimationFrame(() => {
+    transitionFrameId = requestAnimationFrame(() => {
       transitionFrameId = undefined;
       config.onTransitionFrame();
 
-      transitionTimeoutId = globalThis.setTimeout(() => {
+      transitionTimeoutId = setTimeout(() => {
         transitionTimeoutId = undefined;
         config.onComplete?.();
       }, options.durationMs);

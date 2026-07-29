@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import {
+  describe,
+  expect,
+  it,
+} from 'vitest';
 import { useWheelZoomTuning } from '../src/composables/wheel-zoom-tuning';
 
 interface WheelEventInput {
@@ -40,7 +44,9 @@ describe('useWheelZoomTuning', () => {
     const deltas: number[] = [];
 
     const { handleWheelZoom } = useWheelZoomTuning({
-      onScale: (delta) => deltas.push(delta),
+      onScale: (delta) => {
+        deltas.push(delta);
+      },
       wheelScaleFactor: 0.01,
       wheelMaxStep: 1,
     });
@@ -58,7 +64,9 @@ describe('useWheelZoomTuning', () => {
     const deltas: number[] = [];
 
     const { handleWheelZoom } = useWheelZoomTuning({
-      onScale: (delta) => deltas.push(delta),
+      onScale: (delta) => {
+        deltas.push(delta);
+      },
       wheelScaleFactor: 0.01,
       wheelMaxStep: 1,
     });
@@ -75,7 +83,9 @@ describe('useWheelZoomTuning', () => {
     const deltas: number[] = [];
 
     const { handleWheelZoom } = useWheelZoomTuning({
-      onScale: (delta) => deltas.push(delta),
+      onScale: (delta) => {
+        deltas.push(delta);
+      },
       wheelScaleFactor: 0.01,
       wheelMaxStep: 0.2,
     });

@@ -1,6 +1,4 @@
-import type {
-  createApp as createAppType,
-} from 'vue';
+import type { createApp as createAppType } from 'vue';
 import {
   ref,
   defineComponent,
@@ -22,7 +20,7 @@ export interface UseVuewerOptions {
 export function useVuewer(options: UseVuewerOptions) {
   let currentVuewerApp: ReturnType<typeof createAppType> | null = null;
   let currentVuewerContainer: HTMLDivElement | null = null;
-  const isVuewerMounted = ref(false);
+  const vuewerMounted = ref(false);
 
   function cleanup() {
     if (currentVuewerApp) {
@@ -33,7 +31,7 @@ export function useVuewer(options: UseVuewerOptions) {
       currentVuewerContainer.remove();
       currentVuewerContainer = null;
     }
-    isVuewerMounted.value = false;
+    vuewerMounted.value = false;
   }
 
   const VuewerWrapper = defineComponent({
@@ -57,7 +55,7 @@ export function useVuewer(options: UseVuewerOptions) {
   });
 
   function mountVuewer() {
-    if (isVuewerMounted.value) {
+    if (vuewerMounted.value) {
       console.warn('Vuewer is already opened.');
       return;
     }
@@ -71,7 +69,7 @@ export function useVuewer(options: UseVuewerOptions) {
     try {
       currentVuewerApp = createApp(VuewerWrapper);
       currentVuewerApp.mount(currentVuewerContainer);
-      isVuewerMounted.value = true;
+      vuewerMounted.value = true;
     } catch (error) {
       console.error('Failed to mount vuewer:', error);
       cleanup();
@@ -85,6 +83,6 @@ export function useVuewer(options: UseVuewerOptions) {
   return {
     open: mountVuewer,
     close: unmountVuewer,
-    isOpened: computed(() => isVuewerMounted.value),
+    isOpened: computed(() => vuewerMounted.value),
   };
 }

@@ -1,5 +1,9 @@
 import type { Ref } from 'vue';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import {
+  onBeforeUnmount,
+  onMounted,
+  ref,
+} from 'vue';
 import { clamp } from '../utils/math';
 
 export interface ZoomFocalPoint {
@@ -169,10 +173,12 @@ export function useVuewerZoom({
   }
 
   function onTouchEnd(event: TouchEvent): void {
-    if (event.touches.length < 2) {
-      pinchStartDistance.value = null;
-      pinchStartScale.value = imageScale.value;
+    if (event.touches.length >= 2) {
+      return;
     }
+
+    pinchStartDistance.value = null;
+    pinchStartScale.value = imageScale.value;
   }
 
   function onTouchCancel(): void {
