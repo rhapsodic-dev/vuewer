@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import {
+  describe,
+  expect,
+  it,
+} from 'vitest';
 import { getTouchSwipeDirection } from '../src/composables/swipe-navigation';
 
 describe('touch swipe direction detection', () => {

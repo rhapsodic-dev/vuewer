@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import {
+  describe,
+  expect,
+  it,
+} from 'vitest';
 import { useTouchPointerLifecycle } from '../src/composables/touch-pointer-lifecycle';
 
 describe('pointer lifecycle touch bookkeeping', () => {

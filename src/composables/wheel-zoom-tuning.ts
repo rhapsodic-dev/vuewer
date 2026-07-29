@@ -39,7 +39,7 @@ export function useWheelZoomTuning({
   wheelScaleFactor = getDefaultWheelScaleFactor(),
   wheelMaxStep = getDefaultWheelMaxStep(),
 }: UseWheelZoomTuningOptions) {
-  function handleWheelZoom(event: WheelEvent): boolean {
+  function didHandleWheelZoom(event: WheelEvent): boolean {
     const scaleDelta = getWheelScaleDelta(event);
     if (!scaleDelta) {
       return false;
@@ -60,6 +60,6 @@ export function useWheelZoomTuning({
   }
 
   return {
-    handleWheelZoom,
+    handleWheelZoom: didHandleWheelZoom,
   };
 }

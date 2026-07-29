@@ -12,6 +12,7 @@
     @pointermove="onViewerPointerMove"
     @pointerup="onViewerPointerUp"
     @pointercancel="onViewerPointerCancel"
+    @wheel="onWheel"
   >
     <div class="vuewer__overlay" />
     <div
@@ -52,9 +53,9 @@
       <VuewerCloseButton @click="emit('close')" />
     </div>
 
-    <template v-if="hasNonInitialZoom || images.length > 1">
+    <template v-if="nonInitialZoom || images.length > 1">
       <div class="vuewer__navigation">
-        <template v-if="hasNonInitialZoom">
+        <template v-if="nonInitialZoom">
           <VuewerZoomControls
             :zoom-percentage="zoomPercentage"
             @reset="resetScale"
@@ -88,7 +89,12 @@
 <script setup lang="ts">
 import { useIdle } from '@vueuse/core';
 import {
-  computed, useAttrs, ref, watch, onMounted, onBeforeUnmount,
+  computed,
+  useAttrs,
+  ref,
+  watch,
+  onMounted,
+  onBeforeUnmount,
 } from 'vue';
 
 import VuewerNavigationButton from './navigation/button/button.vue';
@@ -106,7 +112,11 @@ import { useWheelScrollTuning } from '../composables/wheel-scroll-tuning';
 import { useMouseClickClose } from '../composables/mouse-click-close';
 import { useTouchSwipeDismiss } from '../composables/touch-swipe-dismiss';
 
-import type { VuewerProps, VuewerEmits, VuewerImage } from '.';
+import type {
+  VuewerProps,
+  VuewerEmits,
+  VuewerImage,
+} from '.';
 
 interface ImageItem {
   id: number;
@@ -176,7 +186,7 @@ const mouseClickClose = useMouseClickClose({
 });
 const contentRef = mouseClickClose.contentRef;
 
-const hasNonInitialZoom = computed(() => Math.abs(zoom.imageScale.value - 1) > 0.001);
+const nonInitialZoom = computed(() => Math.abs(zoom.imageScale.value - 1) > 0.001);
 const zoomPercentage = computed(() => Math.round(zoom.imageScale.value * 100));
 const pan = useVuewerPan({
   viewerRef,
@@ -184,17 +194,17 @@ const pan = useVuewerPan({
   imageScale: zoom.imageScale,
 });
 
-const isTouchGestureNavigationEnabled = computed(() => !pan.isImagePannable.value);
+const touchGestureNavigationEnabled = computed(() => !pan.isImagePannable.value);
 const touchSwipeDismiss = useTouchSwipeDismiss({
   viewerRef,
-  isEnabled: isTouchGestureNavigationEnabled,
+  isEnabled: touchGestureNavigationEnabled,
   onDismiss: () => emit('close'),
 });
 
 const swipeNavigation = useSwipeNavigation({
   viewerRef,
   imageRef: activeImageRef,
-  isSwipeEnabled: isTouchGestureNavigationEnabled,
+  isSwipeEnabled: touchGestureNavigationEnabled,
   onSwipeLeft: () => goToNextImage(),
   onSwipeRight: () => goToPrevImage(),
 });
@@ -282,8 +292,8 @@ const imageViewerKeyboardActions: Record<ImageViewerKeyboardActions, () => void>
 function onKeyDown(event: KeyboardEvent): void {
   const keyCode = event.key.toLowerCase() as ImageViewerKeyboardActions;
 
-  if (keyCode in imageViewerKeyboardActions) {
-    const action = imageViewerKeyboardActions[keyCode];
+  const action = imageViewerKeyboardActions[keyCode];
+  if (action) {
     action();
   }
 }
@@ -332,13 +342,11 @@ watch(imagesMap, (newMap) => {
 }, { immediate: true });
 
 onMounted(() => {
-  globalThis.addEventListener('keydown', onKeyDown);
-  globalThis.addEventListener('wheel', onWheel, { passive: false });
+  addEventListener('keydown', onKeyDown);
 });
 
 onBeforeUnmount(() => {
-  globalThis.removeEventListener('keydown', onKeyDown);
-  globalThis.removeEventListener('wheel', onWheel);
+  removeEventListener('keydown', onKeyDown);
 });
 </script>
 

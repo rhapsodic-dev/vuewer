@@ -1,6 +1,9 @@
 import type { Ref } from 'vue';
 import {
-  computed, onBeforeUnmount, ref, watch,
+  computed,
+  onBeforeUnmount,
+  ref,
+  watch,
 } from 'vue';
 
 import { clamp } from '../utils/math';
@@ -64,11 +67,7 @@ export function isVerticalDismissGesture(config: DismissGestureInput): boolean {
   }
 
   const hasVerticalDominance = absDeltaX === 0 || (absDeltaY / absDeltaX) >= config.dominanceRatio;
-  if (hasVerticalDominance) {
-    return true;
-  }
-
-  return false;
+  return hasVerticalDominance;
 }
 
 export function getDismissProgress(config: DismissProgressInput): number {
@@ -104,9 +103,9 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
   const startClientX = ref(0);
   const startClientY = ref(0);
   const offsetY = ref(0);
-  const isVerticalGesture = ref(false);
-  const isDismissDragging = ref(false);
-  const isAnimating = ref(false);
+  const verticalGesture = ref(false);
+  const dismissDragging = ref(false);
+  const animating = ref(false);
 
   const pointer = useActivePointer();
   const touchPointerLifecycle = useTouchPointerLifecycle();
@@ -141,15 +140,15 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
   }
 
   function runTransition(nextOffsetY: number, onComplete?: () => void): void {
-    isDismissDragging.value = false;
-    isAnimating.value = true;
+    dismissDragging.value = false;
+    animating.value = true;
 
     transition.runTransition({
       onTransitionFrame: () => {
         offsetY.value = nextOffsetY;
       },
       onComplete: () => {
-        isAnimating.value = false;
+        animating.value = false;
         onComplete?.();
       },
     });
@@ -157,7 +156,7 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
 
   function releasePointer(): void {
     pointer.deactivatePointer(options.viewerRef.value);
-    isVerticalGesture.value = false;
+    verticalGesture.value = false;
   }
 
   function resetVisualState(): void {
@@ -168,17 +167,13 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
     transition.cancelTransition();
     releasePointer();
     touchPointerLifecycle.clearPointers();
-    isDismissDragging.value = false;
-    isAnimating.value = false;
+    dismissDragging.value = false;
+    animating.value = false;
     resetVisualState();
   }
 
   function canStartSwipe(event: PointerEvent): boolean {
-    if (!options.isEnabled.value || isAnimating.value || event.pointerType !== 'touch') {
-      return false;
-    }
-
-    return true;
+    return options.isEnabled.value && !animating.value && event.pointerType === 'touch';
   }
 
   function onViewerPointerDown(event: PointerEvent): void {
@@ -193,10 +188,10 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
     }
 
     transition.cancelTransition();
-    isAnimating.value = false;
-    isDismissDragging.value = false;
+    animating.value = false;
+    dismissDragging.value = false;
     pointer.activatePointer(options.viewerRef.value, event.pointerId);
-    isVerticalGesture.value = false;
+    verticalGesture.value = false;
     startClientX.value = event.clientX;
     startClientY.value = event.clientY;
     resetVisualState();
@@ -220,8 +215,8 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
     const deltaX = event.clientX - startClientX.value;
     const deltaY = event.clientY - startClientY.value;
 
-    if (!isVerticalGesture.value) {
-      isVerticalGesture.value = isVerticalDismissGesture({
+    if (!verticalGesture.value) {
+      verticalGesture.value = isVerticalDismissGesture({
         deltaX,
         deltaY,
         thresholdPx: dismissDefaults.lockThresholdPx,
@@ -229,11 +224,11 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
       });
     }
 
-    if (!isVerticalGesture.value) {
+    if (!verticalGesture.value) {
       return;
     }
 
-    isDismissDragging.value = true;
+    dismissDragging.value = true;
     offsetY.value = deltaY;
     event.preventDefault();
   }
@@ -246,7 +241,7 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
     }
 
     const nextOffsetY = event.clientY - startClientY.value;
-    const wasVerticalGesture = isVerticalGesture.value;
+    const wasVerticalGesture = verticalGesture.value;
     const shouldDismiss = (
       wasVerticalGesture
       && options.isEnabled.value
@@ -275,7 +270,7 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
       return;
     }
 
-    isDismissDragging.value = false;
+    dismissDragging.value = false;
     resetVisualState();
   }
 
@@ -295,7 +290,7 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
       return;
     }
 
-    isDismissDragging.value = false;
+    dismissDragging.value = false;
     resetVisualState();
   }
 
@@ -311,7 +306,7 @@ export function useTouchSwipeDismiss(options: UseTouchSwipeDismissOptions) {
 
   return {
     viewerStyle,
-    isDismissDragging,
+    isDismissDragging: dismissDragging,
     onViewerPointerDown,
     onViewerPointerMove,
     onViewerPointerUp,

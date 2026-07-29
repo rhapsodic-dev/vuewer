@@ -22,7 +22,12 @@
 
 <script setup lang="ts">
 import {
-  useTemplateRef, ref, watch, nextTick, onMounted, onBeforeUnmount,
+  useTemplateRef,
+  ref,
+  watch,
+  nextTick,
+  onMounted,
+  onBeforeUnmount,
 } from 'vue';
 import { getNormalizedWheelDominantAxisDelta } from '../../utils/wheel-delta';
 
@@ -35,11 +40,18 @@ const props = defineProps<Props>();
 const carouselContainer = useTemplateRef<HTMLDivElement>('carouselContainer');
 const carouselTrack = useTemplateRef<HTMLDivElement>('carouselTrack');
 const internalActiveIndex = ref<number | undefined>();
-const isActiveSwitchRecenteringPending = ref(false);
+const activeSwitchRecenteringPending = ref(false);
 const activeSwitchMaxWidthTransitionsInFlight = ref(0);
-let firstFallbackFrameId: number | null = null;
-let secondFallbackFrameId: number | null = null;
-let resizeObserver: ResizeObserver | null = null;
+const fallbackFrameIds: {
+  first: number | null;
+  second: number | null;
+} = {
+  first: null,
+  second: null,
+};
+const lifecycleState: { resizeObserver: ResizeObserver | null } = {
+  resizeObserver: null,
+};
 
 function getCarouselItems(): HTMLElement[] {
   if (!carouselTrack.value) {
@@ -105,19 +117,19 @@ function onResize(): void {
 }
 
 function cancelFallbackRecentering(): void {
-  if (firstFallbackFrameId !== null) {
-    cancelAnimationFrame(firstFallbackFrameId);
-    firstFallbackFrameId = null;
+  if (fallbackFrameIds.first !== null) {
+    cancelAnimationFrame(fallbackFrameIds.first);
+    fallbackFrameIds.first = null;
   }
 
-  if (secondFallbackFrameId !== null) {
-    cancelAnimationFrame(secondFallbackFrameId);
-    secondFallbackFrameId = null;
+  if (fallbackFrameIds.second !== null) {
+    cancelAnimationFrame(fallbackFrameIds.second);
+    fallbackFrameIds.second = null;
   }
 }
 
 function finalizeSwitchRecenteringIfSettled(): void {
-  if (!isActiveSwitchRecenteringPending.value) {
+  if (!activeSwitchRecenteringPending.value) {
     return;
   }
 
@@ -126,17 +138,17 @@ function finalizeSwitchRecenteringIfSettled(): void {
   }
 
   centerCurrentlyActiveItem('smooth');
-  isActiveSwitchRecenteringPending.value = false;
+  activeSwitchRecenteringPending.value = false;
 }
 
 function scheduleFallbackRecenteringForSwitch(): void {
   cancelFallbackRecentering();
 
-  firstFallbackFrameId = requestAnimationFrame(() => {
-    firstFallbackFrameId = null;
+  fallbackFrameIds.first = requestAnimationFrame(() => {
+    fallbackFrameIds.first = null;
 
-    secondFallbackFrameId = requestAnimationFrame(() => {
-      secondFallbackFrameId = null;
+    fallbackFrameIds.second = requestAnimationFrame(() => {
+      fallbackFrameIds.second = null;
       finalizeSwitchRecenteringIfSettled();
     });
   });
@@ -156,7 +168,7 @@ function isCarouselItemMaxWidthTransition(event: TransitionEvent): boolean {
 }
 
 function onCarouselTrackTransitionRun(event: TransitionEvent): void {
-  if (!isActiveSwitchRecenteringPending.value) {
+  if (!activeSwitchRecenteringPending.value) {
     return;
   }
 
@@ -168,7 +180,7 @@ function onCarouselTrackTransitionRun(event: TransitionEvent): void {
 }
 
 function onCarouselTrackTransitionEnd(event: TransitionEvent): void {
-  if (!isActiveSwitchRecenteringPending.value) {
+  if (!activeSwitchRecenteringPending.value) {
     return;
   }
 
@@ -216,12 +228,11 @@ function updateEdgePadding(items: HTMLElement[]): void {
 watch(() => props.activeItemId, (_, previousActiveItemId) => {
   const scrollBehavior: ScrollBehavior = previousActiveItemId === undefined ? 'auto' : 'smooth';
   if (scrollBehavior === 'smooth') {
-    isActiveSwitchRecenteringPending.value = true;
-    activeSwitchMaxWidthTransitionsInFlight.value = 0;
+    activeSwitchRecenteringPending.value = true;
   } else {
-    isActiveSwitchRecenteringPending.value = false;
-    activeSwitchMaxWidthTransitionsInFlight.value = 0;
+    activeSwitchRecenteringPending.value = false;
   }
+  activeSwitchMaxWidthTransitionsInFlight.value = 0;
 
   nextTick(() => {
     centerCurrentlyActiveItem(scrollBehavior);
@@ -242,18 +253,18 @@ onMounted(() => {
   window.addEventListener('resize', onResize);
 
   if (typeof ResizeObserver !== 'undefined') {
-    resizeObserver = new ResizeObserver(() => {
+    lifecycleState.resizeObserver = new ResizeObserver(() => {
       const items = getCarouselItems();
       updateEdgePadding(items);
-      centerCurrentlyActiveItem(isActiveSwitchRecenteringPending.value ? 'smooth' : 'auto');
+      centerCurrentlyActiveItem(activeSwitchRecenteringPending.value ? 'smooth' : 'auto');
     });
 
     if (carouselContainer.value) {
-      resizeObserver.observe(carouselContainer.value);
+      lifecycleState.resizeObserver.observe(carouselContainer.value);
     }
 
     if (carouselTrack.value) {
-      resizeObserver.observe(carouselTrack.value);
+      lifecycleState.resizeObserver.observe(carouselTrack.value);
     }
   }
 });
@@ -261,8 +272,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize);
   cancelFallbackRecentering();
-  resizeObserver?.disconnect();
-  resizeObserver = null;
+  lifecycleState.resizeObserver?.disconnect();
+  lifecycleState.resizeObserver = null;
 });
 </script>
 

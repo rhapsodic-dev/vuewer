@@ -11,11 +11,11 @@ export function useMouseClickClose(options: UseMouseClickCloseOptions = {}) {
   const closePointerId = ref<number>();
   const closeStartClientX = ref(0);
   const closeStartClientY = ref(0);
-  const didClosePointerMove = ref(false);
+  const closePointerMoved = ref(false);
 
   function resetClosePointerState(): void {
     closePointerId.value = undefined;
-    didClosePointerMove.value = false;
+    closePointerMoved.value = false;
   }
 
   function isPointerTargetInsideContent(target: EventTarget | null): boolean {
@@ -63,18 +63,18 @@ export function useMouseClickClose(options: UseMouseClickCloseOptions = {}) {
   }
 
   function onViewerPointerMove(event: PointerEvent): void {
-    if (closePointerId.value !== event.pointerId || didClosePointerMove.value) {
+    if (closePointerId.value !== event.pointerId || closePointerMoved.value) {
       return;
     }
 
     if (hasClosePointerMoved(event)) {
-      didClosePointerMove.value = true;
+      closePointerMoved.value = true;
     }
   }
 
   function onViewerPointerUp(event: PointerEvent): void {
     const isSamePointer = closePointerId.value === event.pointerId;
-    const hasPointerStayedStill = !didClosePointerMove.value && !hasClosePointerMoved(event);
+    const hasPointerStayedStill = !closePointerMoved.value && !hasClosePointerMoved(event);
     const shouldClose = (
       isSamePointer
       && hasPointerStayedStill

@@ -94,7 +94,7 @@ export function useWheelScrollTuning({
     return threshold;
   }
 
-  function handleWheelScroll(event: WheelEvent): boolean {
+  function didHandleWheelScroll(event: WheelEvent): boolean {
     const navigationDelta = getNormalizedWheelDominantAxisDelta(event);
     const scrollDirection = Math.sign(navigationDelta);
     if (!scrollDirection) {
@@ -142,7 +142,7 @@ export function useWheelScrollTuning({
   }
 
   return {
-    handleWheelScroll,
+    handleWheelScroll: didHandleWheelScroll,
     resetWheelScrollState,
   };
 }

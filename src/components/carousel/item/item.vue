@@ -11,7 +11,10 @@
 </template>
 
 <script setup lang="ts">
-import type { VuewerCarouselItemEmits, VuewerCarouselItemProps } from '.';
+import type {
+  VuewerCarouselItemEmits,
+  VuewerCarouselItemProps,
+} from '.';
 
 withDefaults(defineProps<VuewerCarouselItemProps>(), {
   isActive: false,
