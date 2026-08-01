@@ -3,7 +3,10 @@ import {
   expect,
   it,
 } from 'vitest';
-import { getPanOffsetAtScaleChange } from '../src/composables/pan';
+import {
+  getPanOffsetAtCenteredScaleChange,
+  getPanOffsetAtScaleChange,
+} from '../src/composables/pan';
 
 describe('getPanOffsetAtScaleChange', () => {
   it('keeps offset unchanged when scales are invalid', () => {
@@ -60,5 +63,35 @@ describe('getPanOffsetAtScaleChange', () => {
 
     expect(nextOffset.offsetX).toBeCloseTo(110, 8);
     expect(nextOffset.offsetY).toBeCloseTo(-55, 8);
+  });
+});
+
+describe('getPanOffsetAtCenteredScaleChange', () => {
+  it('moves the tapped image point to the viewer center', () => {
+    const nextOffset = getPanOffsetAtCenteredScaleChange({
+      previousScale: 1,
+      nextScale: 2,
+      currentOffsetX: 0,
+      currentOffsetY: 0,
+      focalOffsetFromViewerCenterX: 120,
+      focalOffsetFromViewerCenterY: -60,
+    });
+
+    expect(nextOffset.offsetX).toBeCloseTo(-240, 8);
+    expect(nextOffset.offsetY).toBeCloseTo(120, 8);
+  });
+
+  it('accounts for an existing pan offset when centering', () => {
+    const nextOffset = getPanOffsetAtCenteredScaleChange({
+      previousScale: 2,
+      nextScale: 3,
+      currentOffsetX: 40,
+      currentOffsetY: -20,
+      focalOffsetFromViewerCenterX: -100,
+      focalOffsetFromViewerCenterY: 50,
+    });
+
+    expect(nextOffset.offsetX).toBeCloseTo(210, 8);
+    expect(nextOffset.offsetY).toBeCloseTo(-105, 8);
   });
 });

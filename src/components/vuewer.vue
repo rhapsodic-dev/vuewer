@@ -27,6 +27,7 @@
         :class="{
           'vuewer__active-image_state_pannable': pan.isImagePannable.value,
           'vuewer__active-image_state_dragging': pan.isImageDragging.value,
+          'vuewer__active-image_state_double-tap-zooming': doubleTapZoomTransitioning,
         }"
         :style="{ transform: pan.imageTransform.value }"
         draggable="false"
@@ -111,6 +112,8 @@ import { useWheelZoomTuning } from '../composables/wheel-zoom-tuning';
 import { useWheelScrollTuning } from '../composables/wheel-scroll-tuning';
 import { useMouseClickClose } from '../composables/mouse-click-close';
 import { useTouchSwipeDismiss } from '../composables/touch-swipe-dismiss';
+import { useTouchDoubleTap } from '../composables/touch-double-tap';
+import { useScheduledTransition } from '../composables/scheduled-transition';
 
 import type {
   VuewerProps,
@@ -213,11 +216,48 @@ const swipeNavigation = useSwipeNavigation({
 // instead of always zooming around the viewport center.
 zoom.setOnScaleChange(pan.onScaleChange);
 
+const doubleTapZoomTransitionDurationMs = 220;
+const doubleTapZoomTransitioning = ref(false);
+const doubleTapZoomTransition = useScheduledTransition({
+  durationMs: doubleTapZoomTransitionDurationMs,
+});
+
+function runDoubleTapZoomTransition(onTransitionFrame: () => void): void {
+  doubleTapZoomTransitioning.value = true;
+  doubleTapZoomTransition.runTransition({
+    onTransitionFrame,
+    onComplete: () => {
+      doubleTapZoomTransitioning.value = false;
+    },
+  });
+}
+
+function stopDoubleTapZoomTransition(): void {
+  doubleTapZoomTransition.cancelTransition();
+  doubleTapZoomTransitioning.value = false;
+}
+
+const touchDoubleTap = useTouchDoubleTap({
+  imageRef: activeImageRef,
+  onDoubleTap: (tap) => {
+    runDoubleTapZoomTransition(() => {
+      if (zoom.imageScale.value > 1) {
+        resetScale();
+        return;
+      }
+
+      zoom.setScale(2, tap, 'centered');
+    });
+  },
+});
+
 function onViewerPointerDown(event: PointerEvent): void {
+  stopDoubleTapZoomTransition();
   mouseClickClose.onViewerPointerDown(event);
   touchSwipeDismiss.onViewerPointerDown(event);
   pan.onViewerPointerDown(event);
   swipeNavigation.onViewerPointerDown(event);
+  touchDoubleTap.onViewerPointerDown(event);
 }
 
 function onViewerPointerMove(event: PointerEvent): void {
@@ -225,6 +265,7 @@ function onViewerPointerMove(event: PointerEvent): void {
   touchSwipeDismiss.onViewerPointerMove(event);
   pan.onViewerPointerMove(event);
   swipeNavigation.onViewerPointerMove(event);
+  touchDoubleTap.onViewerPointerMove(event);
 }
 
 function onViewerPointerUp(event: PointerEvent): void {
@@ -232,6 +273,7 @@ function onViewerPointerUp(event: PointerEvent): void {
   pan.onViewerPointerUp(event);
   swipeNavigation.onViewerPointerUp(event);
   mouseClickClose.onViewerPointerUp(event);
+  touchDoubleTap.onViewerPointerUp(event);
 }
 
 function onViewerPointerCancel(event: PointerEvent): void {
@@ -239,6 +281,7 @@ function onViewerPointerCancel(event: PointerEvent): void {
   pan.onViewerPointerCancel(event);
   swipeNavigation.onViewerPointerCancel(event);
   mouseClickClose.onViewerPointerCancel();
+  touchDoubleTap.onViewerPointerCancel(event);
 }
 
 function resetScale(): void {
@@ -416,6 +459,10 @@ onBeforeUnmount(() => {
 
       &_dragging {
         cursor: grabbing;
+      }
+
+      &_double-tap-zooming {
+        transition: transform 220ms cubic-bezier(.2, .8, .2, 1);
       }
     }
   }

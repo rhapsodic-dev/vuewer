@@ -11,10 +11,13 @@ export interface ZoomFocalPoint {
   clientY: number;
 }
 
+export type ZoomFocalPointAlignment = 'anchored' | 'centered';
+
 export interface ZoomScaleChange {
   previousScale: number;
   nextScale: number;
   focalPoint?: ZoomFocalPoint;
+  focalPointAlignment?: ZoomFocalPointAlignment;
 }
 
 export interface UseVuewerZoomOptions {
@@ -83,7 +86,11 @@ export function useVuewerZoom({
     setScale(imageScale.value * Math.exp(delta), focalPoint);
   }
 
-  function setScale(scale: number, focalPoint?: ZoomFocalPoint): void {
+  function setScale(
+    scale: number,
+    focalPoint?: ZoomFocalPoint,
+    focalPointAlignment: ZoomFocalPointAlignment = 'anchored',
+  ): void {
     const previousScale = imageScale.value;
     const clampedScale = clampScale(scale);
     const nextScale = Math.round(clampedScale * 100) / 100;
@@ -97,6 +104,7 @@ export function useVuewerZoom({
       previousScale,
       nextScale,
       focalPoint,
+      focalPointAlignment,
     });
   }
 
@@ -290,6 +298,7 @@ export function useVuewerZoom({
     imageScale,
     handleScale,
     resetScale,
+    setScale,
     setOnScaleChange,
   };
 }

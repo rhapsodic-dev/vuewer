@@ -55,6 +55,29 @@ export function getPanOffsetAtScaleChange({
   };
 }
 
+export function getPanOffsetAtCenteredScaleChange({
+  previousScale,
+  nextScale,
+  currentOffsetX,
+  currentOffsetY,
+  focalOffsetFromViewerCenterX,
+  focalOffsetFromViewerCenterY,
+}: PanOffsetAtScaleChangeInput): PanOffset {
+  if (previousScale <= 0 || nextScale <= 0) {
+    return {
+      offsetX: currentOffsetX,
+      offsetY: currentOffsetY,
+    };
+  }
+
+  const scaleRatio = nextScale / previousScale;
+
+  return {
+    offsetX: scaleRatio * (currentOffsetX - focalOffsetFromViewerCenterX),
+    offsetY: scaleRatio * (currentOffsetY - focalOffsetFromViewerCenterY),
+  };
+}
+
 export interface UseVuewerPanOptions {
   viewerRef: Ref<HTMLElement | null>;
   imageRef: Ref<HTMLImageElement | null>;
@@ -186,7 +209,10 @@ export function useVuewerPan({
     const viewerRect = viewer.getBoundingClientRect();
     const focalOffsetFromViewerCenterX = (focalPoint.clientX - viewerRect.left) - (viewer.clientWidth / 2);
     const focalOffsetFromViewerCenterY = (focalPoint.clientY - viewerRect.top) - (viewer.clientHeight / 2);
-    const nextOffset = getPanOffsetAtScaleChange({
+    const getNextPanOffset = scaleChange.focalPointAlignment === 'centered'
+      ? getPanOffsetAtCenteredScaleChange
+      : getPanOffsetAtScaleChange;
+    const nextOffset = getNextPanOffset({
       previousScale: scaleChange.previousScale,
       nextScale: scaleChange.nextScale,
       currentOffsetX: imageOffsetX.value,
