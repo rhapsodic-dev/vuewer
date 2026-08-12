@@ -87,7 +87,7 @@
     "@rhapsodic/stylelint-config": "^1.0.1",
     "@types/node": "^25.9.5",
     "@vitejs/plugin-vue": "^6.0.8",
-    "bumpp": "^11.1.0",
+    "bumpp": "^12.1.1",
     "eslint": "^10.7.0",
     "eslint-plugin-vuejs-accessibility": "^2.5.0",
     "globals": "^17.7.0",
