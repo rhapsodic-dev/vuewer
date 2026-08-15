@@ -78,7 +78,7 @@
     "vue": "^3.5.40"
   },
   "dependencies": {
-    "@vueuse/core": "^14.3.0"
+    "@vueuse/core": "^14.4.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.1",
@@ -88,19 +88,19 @@
     "@types/node": "^25.9.5",
     "@vitejs/plugin-vue": "^6.0.8",
     "bumpp": "^12.1.1",
-    "eslint": "^10.7.0",
+    "eslint": "^10.8.0",
     "eslint-plugin-vuejs-accessibility": "^2.5.0",
-    "globals": "^17.7.0",
-    "lint-staged": "^17.1.0",
-    "sass": "^1.101.0",
+    "globals": "^17.8.0",
+    "lint-staged": "^17.3.0",
+    "sass": "^1.102.0",
     "simple-git-hooks": "^2.13.1",
     "stylelint": "^17.14.1",
     "typescript": "~6.0.3",
-    "vite": "^8.1.5",
+    "vite": "^8.2.0",
     "vite-plugin-dts": "^5.0.3",
     "vitest": "^4.1.10",
     "vue": "^3.5.40",
-    "vue-tsc": "^3.3.7"
+    "vue-tsc": "^3.3.9"
   },
   "simple-git-hooks": {
     "commit-msg": "pnpm exec commitlint --edit",
@@ -110,5 +110,5 @@
     "*.{js,ts,vue}": "eslint --fix",
     "*.{css,scss,vue}": "stylelint --allow-empty-input --fix"
   },
-  "packageManager": "pnpm@11.15.1+sha512.81350b07e53c9538a02f1f2303b4290fa2d7be04e56e2a970c4cc4b417dc761de196edabd49d55c7dc9580db81007c44143e4e3d7e462b3000d23c255122d065"
+  "packageManager": "pnpm@11.19.0+sha512.7881f3ed590d472c4a955e2b88b2121791116066dcc88cbca3849ec9b60f1bbaa6d2ccb221fa91da4e1c65bef2bcbe379365aea7ac539c7bf86dedc3a1b22dce"
 }
