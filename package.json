@@ -95,7 +95,7 @@
     "sass": "^1.103.1",
     "simple-git-hooks": "^2.14.0",
     "stylelint": "^17.14.1",
-    "typescript": "~6.0.3",
+    "typescript": "~7.0.2",
     "vite": "^8.2.2",
     "vite-plugin-dts": "^5.0.3",
     "vitest": "^4.1.10",
