@@ -83,7 +83,7 @@
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
-    "@rhapsodic/eslint-config": "^5.0.0",
+    "@rhapsodic/eslint-config": "^6.0.0",
     "@rhapsodic/stylelint-config": "^2.0.0",
     "@types/node": "^25.9.8",
     "@vitejs/plugin-vue": "^6.0.9",
