@@ -73,11 +73,7 @@ export function useSwipeNavigation({
   }
 
   function canStartTouchSwipeFromPointer(event: PointerEvent): boolean {
-    if (!isSwipeEnabled.value) {
-      return false;
-    }
-
-    if (event.pointerType !== 'touch') {
+    if (!isSwipeEnabled.value || (event.pointerType !== 'touch')) {
       return false;
     }
 

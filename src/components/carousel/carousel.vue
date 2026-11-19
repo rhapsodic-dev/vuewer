@@ -122,18 +122,16 @@ function cancelFallbackRecentering(): void {
     fallbackFrameIds.first = null;
   }
 
-  if (fallbackFrameIds.second !== null) {
-    cancelAnimationFrame(fallbackFrameIds.second);
-    fallbackFrameIds.second = null;
-  }
-}
-
-function finalizeSwitchRecenteringIfSettled(): void {
-  if (!activeSwitchRecenteringPending.value) {
+  if (fallbackFrameIds.second === null) {
     return;
   }
 
-  if (activeSwitchMaxWidthTransitionsInFlight.value > 0) {
+  cancelAnimationFrame(fallbackFrameIds.second);
+  fallbackFrameIds.second = null;
+}
+
+function finalizeSwitchRecenteringIfSettled(): void {
+  if (!activeSwitchRecenteringPending.value || (activeSwitchMaxWidthTransitionsInFlight.value > 0)) {
     return;
   }
 
@@ -156,11 +154,7 @@ function scheduleFallbackRecenteringForSwitch(): void {
 
 function isCarouselItemMaxWidthTransition(event: TransitionEvent): boolean {
   const transitionTarget = event.target;
-  if (!(transitionTarget instanceof HTMLElement)) {
-    return false;
-  }
-
-  if (event.propertyName !== 'max-width') {
+  if (!(transitionTarget instanceof HTMLElement) || (event.propertyName !== 'max-width')) {
     return false;
   }
 
@@ -168,11 +162,7 @@ function isCarouselItemMaxWidthTransition(event: TransitionEvent): boolean {
 }
 
 function onCarouselTrackTransitionRun(event: TransitionEvent): void {
-  if (!activeSwitchRecenteringPending.value) {
-    return;
-  }
-
-  if (!isCarouselItemMaxWidthTransition(event)) {
+  if (!activeSwitchRecenteringPending.value || !isCarouselItemMaxWidthTransition(event)) {
     return;
   }
 
@@ -180,11 +170,7 @@ function onCarouselTrackTransitionRun(event: TransitionEvent): void {
 }
 
 function onCarouselTrackTransitionEnd(event: TransitionEvent): void {
-  if (!activeSwitchRecenteringPending.value) {
-    return;
-  }
-
-  if (!isCarouselItemMaxWidthTransition(event)) {
+  if (!activeSwitchRecenteringPending.value || !isCarouselItemMaxWidthTransition(event)) {
     return;
   }
 
@@ -252,20 +238,22 @@ onMounted(() => {
   });
   window.addEventListener('resize', onResize);
 
-  if (typeof ResizeObserver !== 'undefined') {
-    lifecycleState.resizeObserver = new ResizeObserver(() => {
-      const items = getCarouselItems();
-      updateEdgePadding(items);
-      centerCurrentlyActiveItem(activeSwitchRecenteringPending.value ? 'smooth' : 'auto');
-    });
+  if (typeof ResizeObserver === 'undefined') {
+    return;
+  }
 
-    if (carouselContainer.value) {
-      lifecycleState.resizeObserver.observe(carouselContainer.value);
-    }
+  lifecycleState.resizeObserver = new ResizeObserver(() => {
+    const items = getCarouselItems();
+    updateEdgePadding(items);
+    centerCurrentlyActiveItem(activeSwitchRecenteringPending.value ? 'smooth' : 'auto');
+  });
 
-    if (carouselTrack.value) {
-      lifecycleState.resizeObserver.observe(carouselTrack.value);
-    }
+  if (carouselContainer.value) {
+    lifecycleState.resizeObserver.observe(carouselContainer.value);
+  }
+
+  if (carouselTrack.value) {
+    lifecycleState.resizeObserver.observe(carouselTrack.value);
   }
 });
 

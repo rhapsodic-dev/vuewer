@@ -378,10 +378,12 @@ watch(imagesMap, (newMap) => {
     return;
   }
 
-  if (currentImage.value && !newMap.has(currentImage.value.id)) {
-    currentImage.value = defaultImage.value;
-    resetScale();
+  if (!currentImage.value || newMap.has(currentImage.value.id)) {
+    return;
   }
+
+  currentImage.value = defaultImage.value;
+  resetScale();
 }, { immediate: true });
 
 onMounted(() => {

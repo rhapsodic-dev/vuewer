@@ -8,18 +8,16 @@ import {
 import { useWheelScrollTuning } from '../src/composables/wheel-scroll-tuning';
 
 interface WheelEventInput {
-  deltaX?: number;
   deltaY?: number;
   deltaMode?: number;
 }
 
 function createWheelEvent({
-  deltaX = 0,
   deltaY = 0,
   deltaMode = 0,
 }: WheelEventInput): WheelEvent {
   return {
-    deltaX,
+    deltaX: 0,
     deltaY,
     deltaMode,
   } as WheelEvent;

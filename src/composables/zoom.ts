@@ -206,8 +206,7 @@ export function useVuewerZoom({
   }
 
   function getGestureScale(event: WebKitGestureEvent): number | null {
-    if (typeof event.scale !== 'number') return null;
-    if (!Number.isFinite(event.scale) || event.scale <= 0) return null;
+    if ((typeof event.scale !== 'number') || !Number.isFinite(event.scale) || event.scale <= 0) return null;
 
     return event.scale;
   }
