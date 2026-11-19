@@ -75,7 +75,7 @@
     "./dist/style.css"
   ],
   "peerDependencies": {
-    "vue": "^3.5.44"
+    "vue": "^3.5.45"
   },
   "dependencies": {
     "@vueuse/core": "^15.0.0"
@@ -85,22 +85,22 @@
     "@commitlint/config-conventional": "^21.2.4",
     "@rhapsodic/eslint-config": "^5.0.0",
     "@rhapsodic/stylelint-config": "^2.0.0",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@vitejs/plugin-vue": "^6.0.10",
     "bumpp": "^12.3.0",
-    "eslint": "^10.13.0",
+    "eslint": "^10.14.0",
     "eslint-plugin-vuejs-accessibility": "^2.6.3",
-    "globals": "^17.13.0",
+    "globals": "^17.14.0",
     "lint-staged": "^17.6.0",
-    "sass": "^1.106.1",
+    "sass": "^1.107.1",
     "simple-git-hooks": "^2.14.0",
     "stylelint": "^17.16.0",
     "typescript": "~6.0.3",
-    "vite": "^8.3.5",
+    "vite": "^8.3.6",
     "vite-plugin-dts": "^5.1.2",
-    "vitest": "^5.0.5",
-    "vue": "^3.5.44",
-    "vue-tsc": "^3.3.13"
+    "vitest": "^5.1.0",
+    "vue": "^3.5.45",
+    "vue-tsc": "^3.3.14"
   },
   "simple-git-hooks": {
     "commit-msg": "pnpm exec commitlint --edit",
