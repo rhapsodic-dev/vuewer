@@ -31,10 +31,12 @@ export function useScheduledTransition(options: UseScheduledTransitionOptions) {
       transitionFrameId = undefined;
     }
 
-    if (transitionTimeoutId !== undefined) {
-      clearTimeout(transitionTimeoutId);
-      transitionTimeoutId = undefined;
+    if (transitionTimeoutId === undefined) {
+      return;
     }
+
+    clearTimeout(transitionTimeoutId);
+    transitionTimeoutId = undefined;
   }
 
   /**
